@@ -162,7 +162,14 @@
 			"if run loadimage; then " \
 				"run mmcboot; " \
 			"else " \
-				"echo Failed to boot from current MMC ...; " \
+				"for part in 3 4 1; do " \
+					"echo trying to boot from partition ${part}...; " \
+					"setenv mmcpart ${part}; " \
+					"if run loadimage; then " \
+						"run mmcboot; " \
+					"fi; " \
+				"done; " \
+				"echo Failed to boot from any source!; " \
 			"fi; " \
 		"fi; " \
 	"else " \
