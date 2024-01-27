@@ -101,9 +101,9 @@
 		"bootaux ${m7_addr};\0" \
 	"optargs=setenv bootargs ${bootargs} ${kernelargs};\0" \
 	"mmcargs=setenv bootargs ${mcore_clk} console=${console} " \
-		"root=/dev/mmcblk${mmcblk}p${mmcpart} rootwait rw ${cma_size} cma_name=linux,cma\0 " \
+		"root=/dev/mmcblk${mmcblk}p${mmcpart} rootwait ${rauc_slot} rw ${cma_size} cma_name=linux,cma\0 " \
 	"bootenv=uEnv.txt\0" \
-	"loadbootscript=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootdir}/${bsp_script};\0" \
+	"loadbootscript=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bsp_script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
 	"loadbootenv=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootdir}/${bootenv}\0" \
@@ -155,6 +155,8 @@
 		"if run loadbootscript; then " \
 			"run bootscript; " \
 		"else "\
+			"echo No bootscript found, booting from mmc...; " \
+			"setenv rauc_slot;" \
 			"if run loadbootenv; then " \
 				"echo Loaded environment from ${bootenv}; " \
 				"run importbootenv; " \
