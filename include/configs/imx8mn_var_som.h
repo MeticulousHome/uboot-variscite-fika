@@ -151,6 +151,16 @@
 		"run prepare_mcore; " \
 	"fi; " \
 	"if mmc rescan; then " \
+		"echo Testing fastboot ...; " \
+		"if gpio read recovery_pin 154; then " \
+			"if test $recovery_pin = 0;" \
+				"then "\
+				"echo Not going into recovery" \
+			"else " \
+				"echo Recovery button pressed. Dropping into fastboot;" \
+				"fastboot usb 1;" \
+			"fi;" \
+		"fi;" \
 		"if test ${use_m7} = yes && run loadm7bin; then " \
 			"run runm7bin; " \
 		"fi; " \
