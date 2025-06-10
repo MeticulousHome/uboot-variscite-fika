@@ -75,7 +75,6 @@
 	"fdt_addr=0x43000000\0" \
 	"fdt_high=0xffffffffffffffff\0" \
 	"boot_fdt=try\0" \
-	"ip_dyn=yes\0" \
 	"fdt_file=undefined\0" \
 	"bootm_size=0x10000000\0" \
 	"initrd_addr=0x43800000\0" \
@@ -143,30 +142,6 @@
 		"else " \
 			"echo wait for boot; " \
 		"fi;\0" \
-	"nfsroot=/srv/nfs/" CONFIG_SYS_BOARD "/rootfs\0" \
-	"netargs=setenv bootargs ${mcore_clk} console=${console} " \
-		"root=/dev/nfs ${cma_size} cma_name=linux,cma " \
-		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
-	"netboot=echo Booting from net ...; " \
-		"if test ${ip_dyn} = yes; then " \
-			"setenv get_cmd dhcp; " \
-		"else " \
-			"setenv get_cmd tftp; " \
-		"fi; " \
-		"${get_cmd} ${img_addr} ${image}; unzip ${img_addr} ${loadaddr};" \
-		"run netargs; " \
-		"run optargs; " \
-		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
-			"run findfdt; " \
-			"echo fdt_file=${fdt_file}; " \
-			"if ${get_cmd} ${fdt_addr_r} ${fdt_file}; then " \
-				"booti ${loadaddr} - ${fdt_addr_r}; " \
-			"else " \
-				"echo WARN: Cannot load the DT; " \
-			"fi; " \
-		"else " \
-			"booti; " \
-		"fi;\0" \
 	"bsp_bootcmd=echo Running BSP bootcmd ...; " \
 	"run ramsize_check; " \
 	"mmc dev ${mmcdev}; " \
@@ -187,7 +162,7 @@
 			"if run loadimage; then " \
 				"run mmcboot; " \
 			"else " \
-				"run netboot; " \
+				"echo Failed to boot from current MMC ...; " \
 			"fi; " \
 		"fi; " \
 	"else " \
