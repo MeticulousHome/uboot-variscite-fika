@@ -113,11 +113,11 @@
 	"findfdt=" \
 		"if test $fdt_file = undefined; then " \
 			"if test ${som_rev} -lt 2; then " \
-				"setenv fdt_file imx8mn-var-som-1.x-symphony.dtb; " \
+				"setenv fdt_file imx8mn-var-som-meticulous.dtb; " \
 			"elif test ${som_has_wbe} = 1; then " \
 				"setenv fdt_file imx8mn-var-som-wbe-symphony.dtb; " \
 			"else " \
-				"setenv fdt_file imx8mn-var-som-symphony.dtb; " \
+				"setenv fdt_file imx8mn-var-som-meticulous-v2.dtb; " \
 			"fi; " \
 		"fi; \0" \
 	"loadfdt=run findfdt; " \
