@@ -76,11 +76,13 @@
 	"fdt_high=0xffffffffffffffff\0" \
 	"boot_fdt=try\0" \
 	"fdt_file=undefined\0" \
+	"last_some=undefined\0" \
 	"bootm_size=0x10000000\0" \
 	"initrd_addr=0x43800000\0" \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcautodetect=yes\0" \
-	"mmcpart=1\0" \
+	"mmcpart=3\0" \
+	"bootpart=2\0" \
 	"m7_addr=0x7e0000\0" \
 	"m7_bin=hello_world.bin\0" \
 	"use_m7=no\0" \
@@ -102,16 +104,16 @@
 	"mmcargs=setenv bootargs ${mcore_clk} console=${console} " \
 		"root=/dev/mmcblk${mmcdev}p${mmcpart} rootwait ${rauc_slot} rw ${cma_size} cma_name=linux,cma\0 " \
 	"bootenv=uEnv.txt\0" \
-	"loadbootscript=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bsp_script};\0" \
+	"loadbootscript=load mmc ${mmcdev}:${bootpart} ${loadaddr} ${bsp_script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
-	"loadbootenv=load mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootdir}/${bootenv}\0" \
+	"loadbootenv=load mmc ${mmcdev}:${bootpart} ${loadaddr} ${bootenv}\0" \
 	"importbootenv=echo Importing environment from mmc ...; " \
 		"env import -t -r $loadaddr $filesize\0" \
 	"loadimage=load mmc ${mmcdev}:${mmcpart} ${img_addr} ${bootdir}/${image};" \
 		"unzip ${img_addr} ${loadaddr}\0" \
 	"findfdt=" \
-		"if test $fdt_file = undefined; then " \
+		"if test ${last_som} != undefined -a ${last_som} != ${som_rev} || test $fdt_file = undefined; then " \
 			"if test ${som_rev} -lt 2; then " \
 				"setenv fdt_file imx8mn-var-som-meticulous.dtb; " \
 			"elif test ${som_has_wbe} = 1; then " \
@@ -119,7 +121,8 @@
 			"else " \
 				"setenv fdt_file imx8mn-var-som-meticulous-v2.dtb; " \
 			"fi; " \
-		"fi; \0" \
+		"fi;" \
+		"setenv last_som ${som_rev}; \0" \
 	"loadfdt=run findfdt; " \
 		"echo fdt_file=${fdt_file}; " \
 		"load mmc ${mmcdev}:${mmcpart} ${fdt_addr_r} ${bootdir}/${fdt_file}\0" \
@@ -151,27 +154,24 @@
 		"if test ${use_m7} = yes && run loadm7bin; then " \
 			"run runm7bin; " \
 		"fi; " \
+		"if run loadbootenv; then " \
+			"echo Loaded environment from ${bootenv}; " \
+			"run importbootenv; " \
+		"fi;" \
 		"if run loadbootscript; then " \
 			"run bootscript; " \
 		"else "\
 			"echo No bootscript found, booting from mmc...; " \
+			"setenv fdt_file; " \
 			"setenv rauc_slot;" \
-			"if run loadbootenv; then " \
-				"echo Loaded environment from ${bootenv}; " \
-				"run importbootenv; " \
-			"fi;" \
-			"if run loadimage; then " \
-				"run mmcboot; " \
-			"else " \
-				"for part in 3 4 1; do " \
-					"echo trying to boot from partition ${part}...; " \
-					"setenv mmcpart ${part}; " \
-					"if run loadimage; then " \
-						"run mmcboot; " \
-					"fi; " \
-				"done; " \
-				"echo Failed to boot from any source!; " \
-			"fi; " \
+			"for part in 3 4 1; do " \
+				"echo trying to boot from partition ${part}...; " \
+				"setenv mmcpart ${part}; " \
+				"if run loadimage; then " \
+					"run mmcboot; " \
+				"fi; " \
+			"done; " \
+			"echo Failed to boot from any source!; " \
 		"fi; " \
 	"else " \
 		"booti ${loadaddr} - ${fdt_addr}; " \
