@@ -110,7 +110,7 @@
 	"loadbootenv=load mmc ${mmcdev}:${bootpart} ${loadaddr} ${bootenv}\0" \
 	"importbootenv=echo Importing environment from mmc ...; " \
 		"env import -t -r $loadaddr $filesize\0" \
-	"loadimage=load mmc ${mmcdev}:${mmcpart} ${img_addr} ${bootdir}/${image};" \
+	"loadimage=load mmc ${mmcdev}:${mmcpart} ${img_addr} ${bootdir}/${image} && " \
 		"unzip ${img_addr} ${loadaddr}\0" \
 	"findfdt=" \
 		"if test ${last_som} != undefined -a ${last_som} != ${som_rev} || test $fdt_file = undefined; then " \
