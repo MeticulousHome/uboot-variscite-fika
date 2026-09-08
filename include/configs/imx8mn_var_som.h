@@ -151,16 +151,19 @@
 		"run prepare_mcore; " \
 	"fi; " \
 	"if mmc rescan; then " \
-		"echo Testing fastboot ...; " \
-		"if gpio read recovery_pin 154; then " \
-			"if test $recovery_pin = 0;" \
-				"then "\
-				"echo Not going into recovery" \
-			"else " \
-				"echo Recovery button pressed. Dropping into fastboot;" \
-				"fastboot usb 1;" \
-			"fi;" \
-		"fi;" \
+		"setenv rauc_switch_requested; " \
+		"if gpio read rear_button 154; then " \
+			"if test ${rear_button} = 0; then " \
+				"sleep 0.1; " \
+				"if gpio read rear_button 154; then " \
+					"if test ${rear_button} = 0; then " \
+						"echo Rear button pressed. Requesting one-shot RAUC slot switch.; " \
+						"setenv rauc_switch_requested 1; " \
+					"fi; " \
+				"fi; " \
+			"fi; " \
+		"fi; " \
+		"setenv rear_button; " \
 		"if test ${use_m7} = yes && run loadm7bin; then " \
 			"run runm7bin; " \
 		"fi; " \
