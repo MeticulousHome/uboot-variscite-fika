@@ -41,6 +41,12 @@
 };
 
 &iomuxc {
+	pinctrl_rear_button: rearbuttongrp {
+		fsl,pins = <
+			MX8MN_IOMUXC_UART3_RXD_GPIO5_IO26		0x61
+		>;
+	};
+
 	pinctrl_i2c2: i2c2grp {
 		fsl,pins = <
 			MX8MN_IOMUXC_I2C2_SCL_I2C2_SCL			0x400001c3
@@ -117,6 +123,11 @@
 			MX8MN_IOMUXC_SAI2_RXC_GPIO4_IO22		0x41
 		>;
 	};
+};
+
+&gpio5 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_rear_button>;
 };
 
 &i2c2 {
